@@ -1,4 +1,4 @@
-import { Button, Card, Grid, Group, Modal, Select, Stack, Switch, Text, TextInput, Title } from "@mantine/core";
+import { Button, Card, Grid, Group, Modal, NumberInput, Select, Stack, Switch, Text, TextInput, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -85,6 +85,12 @@ export function SiteSettings() {
   // Restored when the user backs out of the OCR confirmation dialog.
   const [previousOcrModel, setPreviousOcrModel] = useState(OCR_DISABLED);
   const [faceRecognitionModel, setFaceRecognitionModel] = useState("buffalo_sc");
+  const [archiveDir, setArchiveDir] = useState("");
+  const [cacheDir, setCacheDir] = useState("");
+  const [duplicatesDir, setDuplicatesDir] = useState("");
+  const [scanDir, setScanDir] = useState("");
+  const [archiveAction, setArchiveAction] = useState("scan");
+  const [periodicScanInterval, setPeriodicScanInterval] = useState(60);
   const [warning, setWarning] = useState("none");
   const { t } = useTranslation();
   const { data: settings, isLoading } = useGetSettingsQuery();
@@ -137,6 +143,12 @@ export function SiteSettings() {
       setOcrModel(normalizeOcrModel(settings.ocr_model));
       setPreviousOcrModel(normalizeOcrModel(settings.ocr_model));
       setFaceRecognitionModel(settings.face_recognition_model);
+      setArchiveDir(settings.archive_dir);
+      setCacheDir(settings.cache_dir);
+      setDuplicatesDir(settings.duplicates_dir);
+      setScanDir(settings.scan_dir);
+      setArchiveAction(settings.archive_action);
+      setPeriodicScanInterval(settings.periodic_scan_interval_minutes);
     }
   }, [settings, isLoading]);
 
@@ -386,6 +398,129 @@ export function SiteSettings() {
                   saveSettings({ face_recognition_model: value });
                   setFaceRecognitionModel(value);
                 }}
+              />
+            </Grid.Col>
+            <Grid.Col span={8}>
+              <Stack gap={0}>
+                <Text>{t("sitesettings.archive_dir_header", "Archive Directory")}</Text>
+                <Text fz="sm" c="dimmed">
+                  {t(
+                    "sitesettings.archive_dir_description",
+                    "Root directory for the photo library."
+                  )}
+                </Text>
+              </Stack>
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <TextInput
+                value={archiveDir}
+                onBlur={() => saveSettings({ archive_dir: archiveDir })}
+                onChange={e => setArchiveDir(e.currentTarget.value)}
+                placeholder="/opt/preprod/pictures"
+              />
+            </Grid.Col>
+            <Grid.Col span={8}>
+              <Stack gap={0}>
+                <Text>{t("sitesettings.cache_dir_header", "Cache Directory")}</Text>
+                <Text fz="sm" c="dimmed">
+                  {t(
+                    "sitesettings.cache_dir_description",
+                    "Directory for thumbnails, embeddings and other fast-access data."
+                  )}
+                </Text>
+              </Stack>
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <TextInput
+                value={cacheDir}
+                onBlur={() => saveSettings({ cache_dir: cacheDir })}
+                onChange={e => setCacheDir(e.currentTarget.value)}
+                placeholder="/opt/preprod/cache"
+              />
+            </Grid.Col>
+            <Grid.Col span={8}>
+              <Stack gap={0}>
+                <Text>{t("sitesettings.duplicates_dir_header", "Duplicates Directory")}</Text>
+                <Text fz="sm" c="dimmed">
+                  {t(
+                    "sitesettings.duplicates_dir_description",
+                    "Directory where duplicate copies are stored."
+                  )}
+                </Text>
+              </Stack>
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <TextInput
+                value={duplicatesDir}
+                onBlur={() => saveSettings({ duplicates_dir: duplicatesDir })}
+                onChange={e => setDuplicatesDir(e.currentTarget.value)}
+                placeholder="/opt/preprod/pictures/duplicates"
+              />
+            </Grid.Col>
+            <Grid.Col span={8}>
+              <Stack gap={0}>
+                <Text>{t("sitesettings.scan_dir_header", "Scan Directory")}</Text>
+                <Text fz="sm" c="dimmed">
+                  {t(
+                    "sitesettings.scan_dir_description",
+                    "Source folder to scan for new photos."
+                  )}
+                </Text>
+              </Stack>
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <TextInput
+                value={scanDir}
+                onBlur={() => saveSettings({ scan_dir: scanDir })}
+                onChange={e => setScanDir(e.currentTarget.value)}
+                placeholder="/opt/preprod/pictures/incoming-test"
+              />
+            </Grid.Col>
+            <Grid.Col span={8}>
+              <Stack gap={0}>
+                <Text>{t("sitesettings.archive_action_header", "Scanning Action")}</Text>
+                <Text fz="sm" c="dimmed">
+                  {t(
+                    "sitesettings.archive_action_description",
+                    "Action to perform when scanning the directory."
+                  )}
+                </Text>
+              </Stack>
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <Select
+                data={[
+                  { value: "scan", label: "Scan only" },
+                  { value: "archive", label: "Archive (deduplicate)" },
+                  { value: "both", label: "Scan and Archive" },
+                ]}
+                value={archiveAction}
+                onChange={opt => {
+                  const v = opt?.value ?? "scan";
+                  saveSettings({ archive_action: v });
+                  setArchiveAction(v);
+                }}
+              />
+            </Grid.Col>
+            <Grid.Col span={8}>
+              <Stack gap={0}>
+                <Text>{t("sitesettings.periodic_scan_header", "Periodic Scan Interval")}</Text>
+                <Text fz="sm" c="dimmed">
+                  {t(
+                    "sitesettings.periodic_scan_description",
+                    "Minutes between automatic scans (0 = disabled)."
+                  )}
+                </Text>
+              </Stack>
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <NumberInput
+                value={periodicScanInterval}
+                min={0}
+                max={1440}
+                step={5}
+                onBlur={() => saveSettings({ periodic_scan_interval_minutes: periodicScanInterval })}
+                onChange={v => setPeriodicScanInterval(v ?? 0)}
               />
             </Grid.Col>
           </Grid>

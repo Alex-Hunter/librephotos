@@ -16,6 +16,12 @@ export const SiteSettings = z.object({
   face_recognition_model: z.string(),
   nextcloud_enabled: z.boolean().default(false),
   email_configured: z.boolean().optional(),
+  archive_dir: z.string(),
+  cache_dir: z.string(),
+  duplicates_dir: z.string(),
+  scan_dir: z.string(),
+  archive_action: z.string(),
+  periodic_scan_interval_minutes: z.number().min(0).max(1440),
 });
 
 export type SiteSettings = z.infer<typeof SiteSettings>;
