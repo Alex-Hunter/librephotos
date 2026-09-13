@@ -133,6 +133,12 @@ class SiteSettingsView(APIView):
         out["face_recognition_model"] = site_config.FACE_RECOGNITION_MODEL
         out["nextcloud_enabled"] = site_config.NEXTCLOUD_ENABLED
         out["email_configured"] = email_is_configured()
+        out["archive_dir"] = site_config.ARCHIVE_DIR
+        out["cache_dir"] = site_config.CACHE_DIR
+        out["duplicates_dir"] = site_config.DUPLICATES_DIR
+        out["scan_dir"] = site_config.SCAN_DIR
+        out["archive_action"] = site_config.ARCHIVE_ACTION
+        out["periodic_scan_interval_minutes"] = site_config.PERIODIC_SCAN_INTERVAL_MINUTES
         return Response(out)
 
     def post(self, request, format=None):
@@ -161,6 +167,18 @@ class SiteSettingsView(APIView):
             site_config.FACE_RECOGNITION_MODEL = request.data["face_recognition_model"]
         if "nextcloud_enabled" in request.data.keys():
             site_config.NEXTCLOUD_ENABLED = request.data["nextcloud_enabled"]
+        if "archive_dir" in request.data.keys():
+            site_config.ARCHIVE_DIR = request.data["archive_dir"]
+        if "cache_dir" in request.data.keys():
+            site_config.CACHE_DIR = request.data["cache_dir"]
+        if "duplicates_dir" in request.data.keys():
+            site_config.DUPLICATES_DIR = request.data["duplicates_dir"]
+        if "scan_dir" in request.data.keys():
+            site_config.SCAN_DIR = request.data["scan_dir"]
+        if "archive_action" in request.data.keys():
+            site_config.ARCHIVE_ACTION = request.data["archive_action"]
+        if "periodic_scan_interval_minutes" in request.data.keys():
+            site_config.PERIODIC_SCAN_INTERVAL_MINUTES = int(request.data["periodic_scan_interval_minutes"])
         if not do_all_models_exist():
             AsyncTask(download_models, User.objects.get(id=request.user.id)).run()
 

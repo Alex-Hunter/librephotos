@@ -1,5 +1,6 @@
 import io
 import os
+import uuid
 import zipfile
 
 from django.conf import settings
@@ -145,3 +146,35 @@ def delete_zip_file(filename):
     except Exception as e:
         util.logger.error(f"Error while deleting file: {e}")
         return e
+
+
+def periodic_scan_worker():
+    """Triggered by django-q schedule based on PERIODIC_SCAN_INTERVAL_MINUTES."""
+    from constance import config as site_config
+    from api.directory_watcher import scan_photos
+    from api.models import User
+    interval = site_config.PERIODIC_SCAN_INTERVAL_MINUTES
+    if interval <= 0:
+        return
+    admin = User.objects.filter(is_superuser=True).first()
+    if admin is None:
+        return
+    scan_dir = site_config.SCAN_DIR or admin.scan_directory
+    action = site_config.ARCHIVE_ACTION or "scan"
+    if action in ("scan", "both"):
+        AsyncTask(
+            scan_photos,
+            admin,
+            full_scan=False,
+            job_id=str(uuid.uuid4()),
+            scan_directory=scan_dir,
+        ).run()
+    if action in ("archive", "both"):
+        from api.archiver.engine import run_archiver
+        AsyncTask(
+            run_archiver,
+            admin.id,
+            scan_dir,
+            None,
+            str(uuid.uuid4()),
+        ).run()

@@ -27,5 +27,11 @@ site_settings_schema = {
         "ocr_model": {"type": "string"},
         "face_recognition_model": {"type": "string"},
         "nextcloud_enabled": {"type": "boolean"},
+        "archive_dir": {"type": "string"},
+        "cache_dir": {"type": "string"},
+        "duplicates_dir": {"type": "string"},
+        "scan_dir": {"type": "string"},
+        "archive_action": {"type": "string"},
+        "periodic_scan_interval_minutes": {"type": "integer"},
     },
 }
