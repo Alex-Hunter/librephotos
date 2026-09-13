@@ -62,6 +62,7 @@ from api.views import (
     user,
     views,
 )
+from api.archiver.views import ArchiverRunView
 from nextcloud import views as nextcloud_views
 import os
 
@@ -408,6 +409,16 @@ urlpatterns = [
         name="delete-zip",
     ),
     re_path(r"^api/rqavailable/$", jobs.QueueAvailabilityView.as_view()),
+    re_path(
+        r"^api/archiver/run/$",
+        ArchiverRunView.as_view(),
+        name="archiver-run",
+    ),
+    re_path(
+        r"^api/archiver/$",
+        ArchiverRunView.as_view(),
+        name="archiver",
+    ),
     re_path(r"^api/nextcloud/listdir", nextcloud_views.ListDir.as_view()),
     re_path(r"^api/nextcloud/scanphotos", nextcloud_views.ScanPhotosView.as_view()),
     re_path(r"^api/photos/download$", views.ZipListPhotosView_V2.as_view()),
