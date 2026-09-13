@@ -134,7 +134,7 @@ class Photo(models.Model):
 
     # Color hash (mean RGB per 4x4 block) — the archiver's main filter against
     # visually different images that happen to match on the two DCT-ish hashes.
-    color_hash = models.CharField(max_length=64, blank=True, null=True, db_index=True)
+    color_hash = models.CharField(max_length=128, blank=True, null=True, db_index=True)
 
     # Organizational photo stacks (RAW+JPEG pairs, bursts, brackets, live photos, manual)
     # A photo can belong to multiple stacks of different types simultaneously
